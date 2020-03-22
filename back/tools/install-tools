@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 
+function pushdq() { pushd ${1} &>/dev/null; }
+function popdq() { popd &>/dev/null; }
+
 function main() {
-	local rootDir="$(dirname "${0}")"
+	local rootRelDir="$(dirname "${0}")"
+	local binRelDir="${rootRelDir}/.bin"
 
-	mkdir -p "${rootDir}/.bin"
-	pushd "$_" &> /dev/null
+	mkdir -p "${binRelDir}"
+	echo ${PWD}
+	rm "${binRelDir}/"*
+	pushdq "${binRelDir}"
 	export GOBIN="${PWD}"
-	popd &> /dev/null
+	popdq
 
-	pushd "${rootDir}" &> /dev/null
-	go generate -tags tools "${rootDir}"
-	popd &> /dev/null
+	pushdq "${rootRelDir}"
+	go generate -tags tools "${rootRelDir}"
+	popdq
 
 	unset GOBIN
 }
